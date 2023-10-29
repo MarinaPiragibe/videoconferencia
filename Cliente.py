@@ -1,7 +1,7 @@
 import pickle
 import socket
 from time import sleep
-import time
+import Utils
 
 class Cliente:
     def __init__(self, nome, ip):
@@ -20,30 +20,21 @@ class Cliente:
     def enviaMensagem(self, clientSocket, msg):
         try:
             clientSocket.send(pickle.dumps(msg))
-            time.sleep(0.2)
+            sleep(0.2)
         except:
             print(f'Falha ao enviar uma mensagem para {clientSocket}')
-
-def recebeUsuario():
-    nome = input('> Informe seu usuario ')
-    ip = input('> Informe seu IP ')
-    usuario = Cliente(nome, ip)
-    return usuario
-
-def imprimeListaUsuarios(listaUsuarios):
-    for usuario in listaUsuarios:
-        print(usuario)
+    
 
 if __name__ == "__main__":
     HOST = '127.0.0.1'
     porta =  9300
 
-    print("------ Sistema de Videoconferencia ------")
-    usuario = recebeUsuario()
+    print("\n\n################ Sistema de Videoconferencia ################\n\n")
+    usuario = Utils.recebeUsuario()
 
     conexao = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
     conexao.settimeout(None)
-    print("Tentando a conexao com o Servidor")
+    print("Fazendo a conexão com o Servidor")
     try:
         conexao.connect((HOST, porta))
         print(f"Conectado")
@@ -54,7 +45,6 @@ if __name__ == "__main__":
     usuario.ativo = True
 
     while usuario.ativo:
-        usuario.enviaMensagem(conexao, usuario.nome)
-        listaUsuarios = usuario.recebeMensagem(conexao)
-        imprimeListaUsuarios(listaUsuarios)
+        usuario.enviaMensagem(conexao, usuario)
+        Utils.menuUsuario(conexao, usuario)
 

@@ -1,8 +1,7 @@
 import socket
 import time
 import pickle
-import cliente.Cliente as Cliente
-
+import Utils
 
 class Servidor:
     def __init__(self):
@@ -13,19 +12,19 @@ class Servidor:
         self.listaClientes = []
         self.ativo = False
 
-def recebeMensagem(clientSocket):
-    while True:
-        msg = pickle.loads(clientSocket.recv(1024))
-        if msg != None:
-            break	
-    return msg
+    def recebeMensagem(self, clientSocket):
+        while True:
+            msg = pickle.loads(clientSocket.recv(1024))
+            if msg != None:
+                break	
+        return msg
 
-def enviaMensagem(clientSocket, msg):
-    try:
-        clientSocket.sendall(pickle.dumps(msg))
-        time.sleep(0.2)
-    except:
-        print(f'Falha ao enviar uma mensagem para {clientSocket}')
+    def enviaMensagem(self, clientSocket, msg):
+        try:
+            clientSocket.sendall(pickle.dumps(msg))
+            time.sleep(0.2)
+        except:
+            print(f'Falha ao enviar uma mensagem para {clientSocket}')
 
 
 if __name__ == "__main__":
@@ -46,12 +45,11 @@ if __name__ == "__main__":
         cliente, endereco = conexao.accept()
         servidor.listaSockets.append(cliente)
 
-        print(servidor.listaSockets)
-        usuario: Cliente = recebeMensagem(cliente)
+        usuario= servidor.recebeMensagem(cliente)
         servidor.listaClientes.append(usuario)
-        print(servidor.listaClientes[0])
+        Utils.imprimeListaUsuarios(servidor.listaClientes)
 
-        enviaMensagem(cliente,servidor.listaClientes)
+        servidor.enviaMensagem(cliente,servidor.listaClientes)
 
 
     
