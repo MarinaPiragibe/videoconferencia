@@ -22,15 +22,29 @@ def menuUsuario(conexao, usuario):
     print("1 - Lista todas os usuários cadastrados")
     print("2 - Buscar pelo nome de um usuário")
     print("3 - Buscar pelo ip de um usuário")
-    print("4 - Sair")
+    print("4 - Desligar conexão com servidor")
+    print("5 - Sair")
     resposta = int(input("\n> "))
 
     if (resposta == 1):
+        usuario.enviaMensagem(conexao,"listagem")
         listaUsuarios = usuario.recebeMensagem(conexao)
         imprimeListaUsuarios(listaUsuarios)
     elif (resposta == 2):
-        pass
+        usuario.enviaMensagem(conexao,"buscarNome")
+
+        nomeProcurado = input("Digite o nome do Cliente que deseja procurar:\n")
+        print("Procurando", nomeProcurado)
+        usuario.enviaMensagem(conexao, nomeProcurado)
+        clienteProcurado = usuario.recebeMensagem(conexao)
+        if(clienteProcurado != []):
+            print(f"Cliente encontrado! \n Nome: {clienteProcurado.nome}\n IP: {clienteProcurado.ip}\n")
+        else:
+            print("Cliente com esse nome não encontrado! Tente novamente\n")
     elif (resposta == 3):
         pass
-    elif (resposta == 4):
+    elif(resposta ==4):
+        usuario.enviaMensagem(conexao,"desligar")
+        
+    elif (resposta == 5):
         quit()
