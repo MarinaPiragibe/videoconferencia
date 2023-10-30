@@ -34,21 +34,21 @@ if __name__ == "__main__":
 
   print(
       "\n\n################ Sistema de Videoconferencia ################\n\n")
-  usuario = Utils.recebeUsuario()
+  cliente = Utils.recebeCliente()
 
   conexao = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   conexao.settimeout(None)
-  print("Fazendo a conexão com o Servidor")
+  print("Fazendo a conexão com o Servidor....")
   try:
     conexao.connect((HOST, porta))
-    print(f"Conectado")
+    print(f"Conectado!")
   except Exception as e:
     print("Conexao com o servidor falhou")
     sleep(2)
     quit()
-  usuario.ativo = True
+  cliente.ativo = True
 
-  while usuario.ativo:
-    usuario.enviaMensagem(conexao, usuario)
-    Utils.menuUsuario(conexao, usuario)
+  while cliente.ativo:
+    cliente.enviaMensagem(conexao, cliente)
+    Utils.menuCliente(conexao, cliente)
 

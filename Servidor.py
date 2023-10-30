@@ -15,36 +15,16 @@ class Servidor:
     self.listaClientes = []
     self.ativo = False
 
-  def configurarNovoCliente(self, cliente, endereco):
-    servidor.listaSockets.append(cliente)
+  def configurarNovoSocketCliente(self, socketCliente, endereco):
+    servidor.listaSockets.append(socketCliente)
 
-    usuario = servidor.recebeMensagem(cliente)
-    servidor.listaClientes.append(usuario)
-    Utils.imprimeListaUsuarios(servidor.listaClientes)
+    cliente = servidor.recebeMensagem(socketCliente)
+    servidor.listaClientes.append(cliente)
+    Utils.imprimeListaClientes(servidor.listaClientes)
 
     conectado = True
     while conectado:
-      msg = servidor.recebeMensagem(cliente)
-      if msg == "listagem":
-        servidor.enviaMensagem(cliente, servidor.listaClientes)
-      
-      if msg == "buscarNome":
-        clienteProcurado = servidor.recebeMensagem(cliente)
-        print("Buscando o cliente ", clienteProcurado, "\n")
-        for p in servidor.listaClientes:
-          if (p.nome == clienteProcurado):
-            servidor.enviaMensagem(cliente, p)
-        servidor.enviaMensagem(cliente, [])
-      if msg == "desligar":
-        try:
-          cliente.close()
-          print("Desconectando o cliente ", usuario.nome, "\n")
-          servidor.listaSockets.remove(cliente)
-          servidor.listaClientes.remove(usuario)
-          conectado = False
-        except:
-          print("Erro ao desconectar o cliente")
-          break
+      conectado = Utils.menuServidor(servidor, socketCliente, cliente)
 
   def recebeMensagem(self, clientSocket):
     while True:
@@ -77,7 +57,6 @@ if __name__ == "__main__":
   while servidor.ativo:
     print("Lista de conexões")
 
-    cliente, endereco = conexao.accept()
-    thread = threading.Thread(target=servidor.configurarNovoCliente,
-                              args=[cliente, endereco])
+    socketCliente, endereco = conexao.accept()
+    thread = threading.Thread(target=servidor.configurarNovoSocketCliente, args=[socketCliente, endereco])
     thread.start()
