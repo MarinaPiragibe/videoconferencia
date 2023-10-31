@@ -62,7 +62,9 @@ if __name__ == "__main__":
   conexao.settimeout(None)
 
   try:
+    #configura o servidor com o IP e a PORTA
     conexao.bind((servidor.HOST, servidor.PORTA))
+    #Após o listen o servidor estará pronto para receber conexões
     conexao.listen()
   except:
     print("Nao foi possivel conectar o Servidor")
@@ -73,7 +75,7 @@ if __name__ == "__main__":
   print("\n################### Servidor Iniciado ###################\n")
 
   while servidor.ativo:
-  
+   #Aguarda a conexão de um cliente
     socketCliente, endereco = conexao.accept()
 
     cliente = servidor.recebeMensagem(socketCliente)
@@ -82,8 +84,10 @@ if __name__ == "__main__":
     if (servidor.verificarCliente(cliente)):
       print("------------ Finalizando Registro -------------")
       servidor.enviaMensagem(socketCliente, True)
+      #Inicia a thread para poder receber mais clientes e a thread executar as requisições do cliente
       thread = threading.Thread(target=servidor.registrarNovoCliente, args=[socketCliente, cliente])
       thread.start()
+      print(f"------------ Número clientes CONECTADOS: {threading.active_count()-1} -------------")
       
     else:
       print("------------ Finalizando Registro -------------")

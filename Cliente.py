@@ -33,6 +33,7 @@ if __name__ == "__main__":
   porta = 9300
 
   print("\n\n################ Sistema de Videoconferencia ################\n\n")
+  #Cria objeto Cliente com os parametros inseridos
   cliente = Utils.recebeCliente()
 
   conexao = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,6 +42,7 @@ if __name__ == "__main__":
   print("\nFazendo a conexão com o Servidor....")
 
   try:
+    #Tenta conectar com o servidor
     conexao.connect((HOST, porta))
   except Exception as e:
     print("\nConexao com o servidor falhou")
