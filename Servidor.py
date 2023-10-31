@@ -15,16 +15,30 @@ class Servidor:
     self.listaClientes = []
     self.ativo = False
 
-  def configurarNovoSocketCliente(self, socketCliente, endereco):
-    servidor.listaSockets.append(socketCliente)
 
-    cliente = servidor.recebeMensagem(socketCliente)
-    servidor.listaClientes.append(cliente)
-    Utils.imprimeListaClientes(servidor.listaClientes)
+  def verificarCliente(self, cliente):
 
+    print(cliente, servidor.listaClientes, cliente not in servidor.listaClientes)
+    estaNaLista = list(filter(lambda x: x.nome == cliente.nome and x.ip == cliente.ip, servidor.listaClientes))
+    
+    if not estaNaLista:
+      print(f'Cliente registrado:\n> NOME: {cliente.nome} \n> IP: {cliente.ip} \n> PORTA: ')
+      servidor.listaSockets.append(socketCliente)
+      servidor.listaClientes.append(cliente)
+      return True
+    
+    else:
+      print("Erro no registro. O cliente já está cadastrado no Sistema\n")
+      return False
+
+  def registrarNovoCliente(self, socketCliente, cliente):
     conectado = True
     while conectado:
       conectado = Utils.menuServidor(servidor, socketCliente, cliente)
+
+    else:
+      return conectado
+
 
   def recebeMensagem(self, clientSocket):
     while True:
@@ -43,20 +57,37 @@ class Servidor:
 
 
 if __name__ == "__main__":
+
   servidor = Servidor()
   conexao = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   conexao.settimeout(None)
+
   try:
     conexao.bind((servidor.HOST, servidor.PORTA))
     conexao.listen()
   except:
     print("Nao foi possivel conectar o Servidor")
     exit
-  servidor.ativo = True
-  print("\n-------------------- Servidor Iniciado --------------------")
-  while servidor.ativo:
-    print("Lista de conexões")
 
+  servidor.ativo = True
+
+  print("\n################### Servidor Iniciado ###################\n")
+
+  while servidor.ativo:
+  
     socketCliente, endereco = conexao.accept()
-    thread = threading.Thread(target=servidor.configurarNovoSocketCliente, args=[socketCliente, endereco])
-    thread.start()
+
+    cliente = servidor.recebeMensagem(socketCliente)
+    print("------------- Iniciando Registro --------------")
+
+    if (servidor.verificarCliente(cliente)):
+      print("------------ Finalizando Registro -------------")
+      servidor.enviaMensagem(socketCliente, True)
+      thread = threading.Thread(target=servidor.registrarNovoCliente, args=[socketCliente, cliente])
+      thread.start()
+      
+    else:
+      print("------------ Finalizando Registro -------------")
+      servidor.enviaMensagem(socketCliente, False)
+
+    Utils.imprimeListaClientes(servidor.listaClientes)
