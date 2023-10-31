@@ -6,9 +6,10 @@ import Utils
 
 class Cliente:
 
-  def __init__(self, nome, ip):
+  def __init__(self, nome, ip, porta):
     self.nome = nome
     self.ip = ip
+    self.porta = porta
     self.ativo = False
 
   def recebeMensagem(self, clientSocket):
@@ -37,13 +38,12 @@ if __name__ == "__main__":
   conexao = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   conexao.settimeout(None)
 
-  print("Fazendo a conexão com o Servidor....")
+  print("\nFazendo a conexão com o Servidor....")
 
   try:
     conexao.connect((HOST, porta))
-    print(f"Conectado!")
   except Exception as e:
-    print("Conexao com o servidor falhou")
+    print("\nConexao com o servidor falhou")
     sleep(2)
     quit()
 
@@ -55,8 +55,10 @@ if __name__ == "__main__":
     registro = cliente.recebeMensagem(conexao)
 
     if not registro:
-      print("Erro ao registrar suas informações. Verifique se já não foi cadastrado antes.")
+      print("Erro ao registrar sseu usuário. Verifique se já não foi cadastrado antes.")
       cliente.ativo = False
-      
+      break
+    
+    print("Usuário registrado com sucesso!")
     Utils.menuCliente(conexao, cliente)
 

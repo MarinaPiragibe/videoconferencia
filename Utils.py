@@ -6,12 +6,10 @@ def recebeCliente():
   print("\n------------- Login --------------")
   nome = input('> Informe seu usuário: ')
   ip = input('> Informe seu IP: ')
-  cliente = Cliente(nome, ip)
+  porta = input('> Informe a porta: ')
+  cliente = Cliente(nome, ip, porta)
   return cliente
 
-
-def buscarClientePeloNome():
-  pass
 
 def imprimeListaClientes(listaClientes):
   print("\n--------- Lista de Usuários Cadastrados ---------")
@@ -19,6 +17,7 @@ def imprimeListaClientes(listaClientes):
     print("\n")
     print(f'> NOME: {cliente.nome}')
     print(f'> IP: {cliente.ip}')
+    print(f'> PORTA: {cliente.porta}')
     print("---------------")
 
 def menuCliente(conexao, cliente):
@@ -44,7 +43,7 @@ def menuCliente(conexao, cliente):
     clienteProcurado = cliente.recebeMensagem(conexao)
     if (clienteProcurado != []):
       print(
-          f"\nCliente encontrado! \n > NOME: {clienteProcurado.nome}\n > IP: {clienteProcurado.ip}\n"
+          f"\nCliente encontrado! \n > NOME: {clienteProcurado.nome}\n > IP: {clienteProcurado.ip}\n > PORTA: {cliente.porta}\n"
       )
     else:
       print("\nCliente com esse nome não encontrado! Tente novamente\n")
@@ -58,7 +57,7 @@ def menuCliente(conexao, cliente):
     clienteProcurado = cliente.recebeMensagem(conexao)
     if (clienteProcurado != []):
       print(
-          f"\nCliente encontrado! \n > NOME: {clienteProcurado.nome}\n > IP: {clienteProcurado.ip}\n"
+          f"\nCliente encontrado! \n > NOME: {clienteProcurado.nome}\n > IP: {clienteProcurado.ip}\n > PORTA: {cliente.porta}\n"
       )
     else:
       print("Cliente com esse nome não encontrado! Tente novamente\n")

@@ -18,8 +18,7 @@ class Servidor:
 
   def verificarCliente(self, cliente):
 
-    print(cliente, servidor.listaClientes, cliente not in servidor.listaClientes)
-    estaNaLista = list(filter(lambda x: x.nome == cliente.nome and x.ip == cliente.ip, servidor.listaClientes))
+    estaNaLista = list(filter(lambda x: x.ip == cliente.ip and x.porta == cliente.porta, servidor.listaClientes))
     
     if not estaNaLista:
       print(f'Cliente registrado:\n> NOME: {cliente.nome} \n> IP: {cliente.ip} \n> PORTA: ')
