@@ -49,18 +49,18 @@ if __name__ == "__main__":
     sleep(2)
     quit()
 
-  cliente.ativo = True
+  cliente.enviaMensagem(conexao, cliente)
+  registro = cliente.recebeMensagem(conexao)
+
+  if not registro:
+    print("Erro ao registrar seu usuário. Verifique se já não foi cadastrado antes.")
+    cliente.ativo = False
+
+  else:
+    print("Usuário registrado com sucesso!")
+    cliente.ativo = True
 
   while cliente.ativo:
 
-    cliente.enviaMensagem(conexao, cliente)
-    registro = cliente.recebeMensagem(conexao)
-
-    if not registro:
-      print("Erro ao registrar sseu usuário. Verifique se já não foi cadastrado antes.")
-      cliente.ativo = False
-      break
-    
-    print("Usuário registrado com sucesso!")
     Utils.menuCliente(conexao, cliente)
 

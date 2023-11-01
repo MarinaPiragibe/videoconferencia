@@ -33,7 +33,6 @@ def menuCliente(conexao, cliente):
     cliente.enviaMensagem(conexao, "listagem")
     listaClientes = cliente.recebeMensagem(conexao)
     imprimeListaClientes(listaClientes)
-
   elif (resposta == 2):
     cliente.enviaMensagem(conexao, "buscarNome")
 
@@ -60,14 +59,14 @@ def menuCliente(conexao, cliente):
           f"\nCliente encontrado! \n > NOME: {clienteProcurado.nome}\n > IP: {clienteProcurado.ip}\n > PORTA: {cliente.porta}\n"
       )
     else:
-      print("Cliente com esse nome não encontrado! Tente novamente\n")
+      print("Cliente com esse IP não encontrado! Tente novamente\n")
 
   elif (resposta == 4):
     cliente.enviaMensagem(conexao, "desligar")
     mensagem = cliente.recebeMensagem(conexao)
     print(mensagem)
-    sleep(2)
     conexao.close()
+    sleep(2)
     quit()
 
 def menuServidor(servidor, socketCliente, cliente):
@@ -83,6 +82,8 @@ def menuServidor(servidor, socketCliente, cliente):
     for cliente in servidor.listaClientes:
       if (cliente.nome == nomeClienteProcurado):
         servidor.enviaMensagem(socketCliente, cliente)
+    servidor.enviaMensagem(socketCliente, [])
+    
 
   elif msg == "buscarIP":
 

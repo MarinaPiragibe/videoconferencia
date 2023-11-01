@@ -79,6 +79,7 @@ if __name__ == "__main__":
     socketCliente, endereco = conexao.accept()
 
     cliente = servidor.recebeMensagem(socketCliente)
+  
     print("------------- Iniciando Registro --------------")
 
     if (servidor.verificarCliente(cliente)):
