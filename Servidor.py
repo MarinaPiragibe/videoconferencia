@@ -15,17 +15,20 @@ class Servidor:
     self.listaClientes = []
     self.ativo = False
 
-
   def verificarCliente(self, cliente):
 
-    estaNaLista = list(filter(lambda x: x.ip == cliente.ip and x.porta == cliente.porta, servidor.listaClientes))
-    
+    estaNaLista = list(
+        filter(lambda x: x.ip == cliente.ip or x.porta == cliente.porta,
+               servidor.listaClientes))
+
     if not estaNaLista:
-      print(f'Cliente registrado:\n> NOME: {cliente.nome} \n> IP: {cliente.ip} \n> PORTA: ')
+      print(
+          f'Cliente registrado:\n> NOME: {cliente.nome} \n> IP: {cliente.ip} \n> PORTA: {cliente.porta} '
+      )
       servidor.listaSockets.append(socketCliente)
       servidor.listaClientes.append(cliente)
       return True
-    
+
     else:
       print("Erro no registro. O cliente já está cadastrado no Sistema\n")
       return False
@@ -37,7 +40,6 @@ class Servidor:
 
     else:
       return conectado
-
 
   def recebeMensagem(self, clientSocket):
     while True:
@@ -75,20 +77,25 @@ if __name__ == "__main__":
   print("\n################### Servidor Iniciado ###################\n")
 
   while servidor.ativo:
-   #Aguarda a conexão de um cliente
+    #Aguarda a conexão de um cliente
     socketCliente, endereco = conexao.accept()
+    print(socketCliente)
 
     cliente = servidor.recebeMensagem(socketCliente)
+
     print("------------- Iniciando Registro --------------")
 
     if (servidor.verificarCliente(cliente)):
       print("------------ Finalizando Registro -------------")
       servidor.enviaMensagem(socketCliente, True)
       #Inicia a thread para poder receber mais clientes e a thread executar as requisições do cliente
-      thread = threading.Thread(target=servidor.registrarNovoCliente, args=[socketCliente, cliente])
+      thread = threading.Thread(target=servidor.registrarNovoCliente,
+                                args=[socketCliente, cliente])
       thread.start()
-      print(f"------------ Número clientes CONECTADOS: {threading.active_count()-1} -------------")
-      
+      print(
+          f"------------ Número clientes CONECTADOS: {threading.active_count()-1} -------------"
+      )
+
     else:
       print("------------ Finalizando Registro -------------")
       servidor.enviaMensagem(socketCliente, False)

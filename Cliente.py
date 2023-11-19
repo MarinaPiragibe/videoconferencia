@@ -2,6 +2,7 @@ import pickle
 import socket
 from time import sleep
 import Utils
+import threading
 
 
 class Cliente:
@@ -11,6 +12,8 @@ class Cliente:
     self.ip = ip
     self.porta = porta
     self.ativo = False
+    self.ocupado = False
+
 
   def recebeMensagem(self, clientSocket):
     while True:
@@ -32,11 +35,13 @@ if __name__ == "__main__":
   HOST = '127.0.0.1'
   porta = 9300
 
-  print("\n\n################ Sistema de Videoconferencia ################\n\n")
+  print(
+      "\n\n################ Sistema de Videoconferencia ################\n\n")
   #Cria objeto Cliente com os parametros inseridos
   cliente = Utils.recebeCliente()
 
   conexao = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  #conexao.bind((str(cliente.ip), int(cliente.porta)))
   conexao.settimeout(None)
 
   print("\nFazendo a conexão com o Servidor....")
@@ -49,18 +54,19 @@ if __name__ == "__main__":
     sleep(2)
     quit()
 
-  cliente.ativo = True
+  cliente.enviaMensagem(conexao, cliente)
+  registro = cliente.recebeMensagem(conexao)
+
+  if not registro:
+    print(
+        "Erro ao registrar seu usuário. Verifique se já não foi cadastrado antes."
+    )
+    cliente.ativo = False
+
+  else:
+    print("Usuário registrado com sucesso!")
+    cliente.ativo = True
 
   while cliente.ativo:
-
-    cliente.enviaMensagem(conexao, cliente)
-    registro = cliente.recebeMensagem(conexao)
-
-    if not registro:
-      print("Erro ao registrar sseu usuário. Verifique se já não foi cadastrado antes.")
-      cliente.ativo = False
-      break
-    
-    print("Usuário registrado com sucesso!")
     Utils.menuCliente(conexao, cliente)
-
+  conexao.close()
