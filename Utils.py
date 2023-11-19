@@ -164,7 +164,6 @@ def menuServidor(servidor, socketCliente, cliente):
     for cliente in servidor.listaClientes:
       if (cliente.nome == nomeClienteProcurado):
         servidor.enviaMensagem(socketCliente, cliente)
-    servidor.enviaMensagem(socketCliente, [])
 
   elif msg == "buscarIP":
 
