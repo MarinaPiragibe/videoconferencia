@@ -124,6 +124,7 @@ def menuCliente(conexao, cliente):
     if (resposta.upper() == "A"):
       
       print("Iniciando a  chamada.......\n")
+      cliente.enviaMensagem(conexaoChamada, cliente.ip)
       
       portaVideoTarget = cliente.recebeMensagem(conexaoChamada)
       portaAudioTarget = cliente.recebeMensagem(conexaoChamada)
@@ -156,6 +157,8 @@ def menuCliente(conexao, cliente):
     cliente.enviaMensagem(socketClienteChamada, resposta)
 
     if (resposta.upper() == "A"):
+      
+      targetIP = cliente.recebeMensagem(socketClienteChamada)
       
       portaAudioHost, portaVideoHost = recebePortasCliente(cliente, socketClienteChamada)
 
