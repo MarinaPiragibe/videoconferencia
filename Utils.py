@@ -8,9 +8,10 @@ import VideoStream
 def recebeCliente():
   print("\n------------- Login --------------")
   nome = input('> Informe seu usuário: ')
-  ip = '26.162.121.69'
+  ip = '26.84.232.20'
+  porta = '9800'
   #input('> Informe seu IP: ')
-  porta = input('> Informe a porta: ')
+  #porta = input('> Informe a porta: ')
   cliente = Cliente(nome, ip, porta)
   return cliente
 
@@ -183,15 +184,15 @@ def menuCliente(conexao, cliente):
       portaVideoTarget = cliente.recebeMensagem(socketClienteChamada)
       portaAudioTarget = cliente.recebeMensagem(socketClienteChamada)
 
-
-      AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
-      
       VideoStream.startVideoSteam(cliente.ip,targetIP,portaVideoHost,portaVideoTarget)
-      
+
+      receiverAudio, targetAudio = AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
+            
       while cliente.ocupado:
         print("Chamada em andamento...")
         desligar = input("> Desligar clique Q!")
         if(desligar.upper() == "Q"):
+          AudioStream.closeAudioStream(receiverAudio, targetAudio)
           cliente.ocupado = False
           break
       

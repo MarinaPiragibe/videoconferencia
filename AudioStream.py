@@ -5,22 +5,18 @@ import socket
 
 localIpAddress = socket.gethostbyname(socket.gethostname())
 
-def startAudioStream(hostIP='26.162.121.69', targetIP='26.84.232.20', recvPort=7777, targetPort=8888): 
+def startAudioStream(hostClientIP=localIpAddress, targetClientIP='26.84.232.20', recvPort=7777, targetClientPort=8888): 
 
-    #server = StreamingServer(localIpAddress, 9999)# IP DA SUA MAQUINA
-    receiver = AudioReceiver(str(hostIP), int(recvPort))# Ip da sua máquina e porta receptora
+    hostClient = AudioReceiver(str(hostClientIP), int(recvPort))# Ip da sua máquina e porta receptora
+    thread_hostClient = threading.Thread(target=hostClient.start_server)
+    thread_hostClient.start()
 
-    #thread_audio_server = threading.Thread(target=server.start_server)
-    thread_audio_receiver = threading.Thread(target=receiver.start_server)
-    #thread_audio_server.start()
-    thread_audio_receiver.start()
+    targetClient = AudioSender(str(targetClientIP), int(targetClientPort)) # Ip da targetClient e porta receptora da targetClient
+    thread_targetClient = threading.Thread(target=targetClient.start_stream)
+    thread_targetClient.start()
 
-    target = AudioSender(str(targetIP), int(targetPort)) # Ip da target e porta receptora da target
-    thread_audio_target = threading.Thread(target=target.start_stream)
-    thread_audio_target.start()
+    return hostClient,targetClient
 
-    return receiver,target
-
-def closeAudioStream(receiver, target):
-    receiver.stop_server()
-    target.stop_stream()
+def closeAudioStream(hostClient, targetClient):
+    hostClient.stop_server()
+    targetClient.stop_stream()
