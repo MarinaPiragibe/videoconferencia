@@ -15,11 +15,9 @@ def startAudioStream(hostIP=localIpAddress, targetIP='26.162.121.69', recvPort=8
     #thread_audio_server.start()
     thread_audio_receiver.start()
 
-    target = AudioSender('26.162.121.69', int(targetPort)) # Ip da target e porta receptora da target
+    target = AudioSender(targetIP, int(targetPort)) # Ip da target e porta receptora da target
     thread_audio_target = threading.Thread(target=target.start_stream)
     thread_audio_target.start()
 
     time.sleep(3)
     return
-
-startAudioStream()

@@ -9,7 +9,7 @@ class Servidor:
 
   def __init__(self):
 
-    self.HOST = '127.0.0.1'
+    self.HOST = ''
     self.PORTA = 9300
     self.listaSockets = []
     self.listaClientes = []

@@ -35,7 +35,7 @@ def imprimeListaClientes(listaClientes):
     print("---------------")
 
 def buscaCliente(cliente, conexao, parametroBusca):
-  
+
   cliente.enviaMensagem(conexao, "buscarNome")
 
   nomeProcurado = input("Digite o nome do Cliente que deseja procurar: ")
@@ -109,12 +109,12 @@ def menuCliente(conexao, cliente):
   # Iniciar chamada
   elif (resposta == 5):
 
-    ipTarget = input("Digite o IP com quem deseja trocar mensagem ?\n")
-    portaTarget = input("Digite a porta com quem deseja trocar mensagem ?\n")
+    targetIP = input("Digite o IP com quem deseja trocar mensagem ?\n")
+    targetPorta = input("Digite a porta com quem deseja trocar mensagem ?\n")
     
     conexaoChamada = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     conexaoChamada.settimeout(None)
-    conexaoChamada.connect((str(ipTarget), int(portaTarget)))
+    conexaoChamada.connect((str(targetIP), int(targetPorta)))
 
     cliente.enviaMensagem(conexaoChamada, f"Chamada do cliente {cliente.nome}")
     
@@ -130,7 +130,7 @@ def menuCliente(conexao, cliente):
       
       portaAudioHost, portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
       
-      AudioStream.startAudioStream(cliente.ip, ipTarget, portaAudioHost, portaAudioTarget)
+      AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
 
 
     if(resposta.upper() == "R"):
@@ -157,12 +157,12 @@ def menuCliente(conexao, cliente):
 
     if (resposta.upper() == "A"):
       
-      portaAudioHost, portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
+      portaAudioHost, portaVideoHost = recebePortasCliente(cliente, socketClienteChamada)
 
       portaVideoTarget = cliente.recebeMensagem(socketClienteChamada)
       portaAudioTarget = cliente.recebeMensagem(socketClienteChamada)
 
-      AudioStream.startAudioStream(cliente.ip, ipTarget, portaAudioHost, portaAudioTarget)
+      AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
 
     if(resposta.upper() == "R"):
       print("Chamada recusada.......\n")
