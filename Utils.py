@@ -2,6 +2,7 @@ from time import sleep
 import socket
 from Cliente import Cliente
 import AudioStream
+import VideoStream
 
 
 def recebeCliente():
@@ -134,6 +135,8 @@ def menuCliente(conexao, cliente):
 
       AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
       
+      VideoStream.startVideoSteam(cliente.ip,targetIP,portaVideoHost,portaVideoTarget)
+      
       while cliente.ocupado:
         print("Chamada em andamento...")
         desligar = input("> Desligar clique Q!")
@@ -175,13 +178,11 @@ def menuCliente(conexao, cliente):
       portaVideoTarget = cliente.recebeMensagem(socketClienteChamada)
       portaAudioTarget = cliente.recebeMensagem(socketClienteChamada)
 
-      print("Opção 6" + cliente.ip)
-      print(targetIP)
-      print(portaAudioHost)
-      print(portaAudioTarget)
 
       AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
-
+      
+      VideoStream.startVideoSteam(cliente.ip,targetIP,portaVideoHost,portaVideoTarget)
+      
     if(resposta.upper() == "R"):
       print("Chamada recusada.......\n")
       cliente.ocupado = False
