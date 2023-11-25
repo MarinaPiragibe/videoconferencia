@@ -19,5 +19,8 @@ def startAudioStream(hostIP='26.162.121.69', targetIP='26.84.232.20', recvPort=7
     thread_audio_target = threading.Thread(target=target.start_stream)
     thread_audio_target.start()
 
-    time.sleep(3)
-    return
+    return receiver,target
+
+def closeAudioStream(receiver, target):
+    receiver.stop_server()
+    target.stop_stream()

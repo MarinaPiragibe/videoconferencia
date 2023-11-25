@@ -133,15 +133,20 @@ def menuCliente(conexao, cliente):
       
       portaAudioHost, portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
 
-      AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
+      VideoStream.startVideoSteam(cliente.ip, targetIP ,portaVideoHost,portaVideoTarget)
+
+      receiverAudio, targetAudio = AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
       
-      VideoStream.startVideoSteam(cliente.ip,targetIP,portaVideoHost,portaVideoTarget)
       
       while cliente.ocupado:
         print("Chamada em andamento...")
         desligar = input("> Desligar clique Q!")
         if(desligar.upper() == "Q"):
           cliente.ocupado = False
+          AudioStream.closeAudioStream(receiverAudio, targetAudio)
+          #videoStream
+          conexaoChamada.close()
+          
           break
         
         
@@ -182,6 +187,13 @@ def menuCliente(conexao, cliente):
       AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
       
       VideoStream.startVideoSteam(cliente.ip,targetIP,portaVideoHost,portaVideoTarget)
+      
+      while cliente.ocupado:
+        print("Chamada em andamento...")
+        desligar = input("> Desligar clique Q!")
+        if(desligar.upper() == "Q"):
+          cliente.ocupado = False
+          break
       
     if(resposta.upper() == "R"):
       print("Chamada recusada.......\n")
