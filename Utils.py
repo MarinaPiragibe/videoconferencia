@@ -7,7 +7,8 @@ import AudioStream
 def recebeCliente():
   print("\n------------- Login --------------")
   nome = input('> Informe seu usuário: ')
-  ip = input('> Informe seu IP: ')
+  ip = '26.162.121.69'
+  #input('> Informe seu IP: ')
   porta = input('> Informe a porta: ')
   cliente = Cliente(nome, ip, porta)
   return cliente
@@ -22,7 +23,7 @@ def recebePortasCliente(cliente, socketClienteChamada):
   portaAudio = int(input("> Qual porta deseja usar para receber o audio?"))
   cliente.enviaMensagem(socketClienteChamada, portaAudio)
 
-  return portaVideo, portaAudio
+  return portaAudio, portaVideo
 
 def imprimeListaClientes(listaClientes):
 
@@ -130,8 +131,17 @@ def menuCliente(conexao, cliente):
       portaAudioTarget = cliente.recebeMensagem(conexaoChamada)
       
       portaAudioHost, portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
-      
+
       AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
+      
+      while cliente.ocupado:
+        print("Chamada em andamento...")
+        desligar = input("> Desligar clique Q!")
+        if(desligar.upper() == "Q"):
+          cliente.ocupado = False
+          break
+        
+        
 
 
     if(resposta.upper() == "R"):
@@ -164,6 +174,11 @@ def menuCliente(conexao, cliente):
 
       portaVideoTarget = cliente.recebeMensagem(socketClienteChamada)
       portaAudioTarget = cliente.recebeMensagem(socketClienteChamada)
+
+      print("Opção 6" + cliente.ip)
+      print(targetIP)
+      print(portaAudioHost)
+      print(portaAudioTarget)
 
       AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
 
