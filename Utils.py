@@ -3,6 +3,7 @@ import socket
 from Cliente import Cliente
 import AudioStream
 import VideoStream
+from vidstream import *
 
 
 def recebeCliente():
@@ -134,29 +135,17 @@ def menuCliente(conexao, cliente):
       
       portaAudioHost, portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
 
-      VideoStream.startVideoSteam(cliente.ip, targetIP ,portaVideoHost,portaVideoTarget)
+      hostClient, targetClient = VideoStream.startVideoSteam(cliente.ip, targetIP ,portaVideoHost,portaVideoTarget)
 
       receiverAudio, targetAudio = AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
       
       
-      while cliente.ocupado:
-        print("Chamada em andamento...")
-        desligar = input("> Desligar clique Q!")
-        if(desligar.upper() == "Q"):
-          cliente.ocupado = False
-          AudioStream.closeAudioStream(receiverAudio, targetAudio)
-          #videoStream
-          conexaoChamada.close()
-          
-          break
-        
-        
-
-
+      desligarChamada(cliente,receiverAudio,targetAudio,hostClient,targetClient,conexaoChamada)
+              
     if(resposta.upper() == "R"):
       print("Chamada Recusada, tente novamente... \n")
       cliente.ocupado = False
-    # conexaoChamada.close()
+      conexaoChamada.close()
 
   # Aceitar chamada
   elif (resposta == 6):
@@ -184,23 +173,16 @@ def menuCliente(conexao, cliente):
       portaVideoTarget = cliente.recebeMensagem(socketClienteChamada)
       portaAudioTarget = cliente.recebeMensagem(socketClienteChamada)
 
-      VideoStream.startVideoSteam(cliente.ip,targetIP,portaVideoHost,portaVideoTarget)
+      hostClient, targetClient = VideoStream.startVideoSteam(cliente.ip,targetIP,portaVideoHost,portaVideoTarget)
 
       receiverAudio, targetAudio = AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
             
-      while cliente.ocupado:
-        print("Chamada em andamento...")
-        desligar = input("> Desligar clique Q!")
-        if(desligar.upper() == "Q"):
-          AudioStream.closeAudioStream(receiverAudio, targetAudio)
-          cliente.ocupado = False
-          break
+      desligarChamada(cliente,receiverAudio,targetAudio,hostClient,targetClient,conexaoChamada) 
       
     if(resposta.upper() == "R"):
       print("Chamada recusada.......\n")
       cliente.ocupado = False
-    # conexaoChamada.close()
-    # socketClienteChamada.close()
+      conexaoChamada.close()
 
 def menuServidor(servidor, socketCliente, cliente):
 
@@ -241,3 +223,17 @@ def menuServidor(servidor, socketCliente, cliente):
       print("Erro ao desconectar o cliente")
 
   return True
+
+
+
+def desligarChamada(cliente, receiverAudio,targetAudio,hostClient, targetClient, conexaoChamada):
+  while input("").upper() != "STOP":
+    print("Chamada em andamento...")
+    continue
+    
+  cliente.ocupado = False
+  receiverAudio.stop_server()
+  targetAudio.stop_stream()
+  hostClient.stop_server()
+  targetClient.stop_stream()
+  conexaoChamada.close()

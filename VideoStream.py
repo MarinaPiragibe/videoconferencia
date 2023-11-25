@@ -16,7 +16,7 @@ def startVideoSteam(hostIP=localIpAddress, targetIP='26.162.121.69', hostPort=88
     thread_targetClient = threading.Thread(target=targetClient.start_stream)
     thread_targetClient.start()
 
-    return
+    return hostClient, targetClient
     
 
 
