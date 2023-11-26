@@ -40,17 +40,42 @@ def imprimeListaClientes(listaClientes):
 
 def buscaCliente(cliente, conexao, parametroBusca):
 
-  cliente.enviaMensagem(conexao, "buscarNome")
+  cliente.enviaMensagem(conexao, parametroBusca)
 
-  nomeProcurado = input("Digite o nome do Cliente que deseja procurar: ")
-  print(f'\nProcurando NOME: {nomeProcurado} ...')
-  cliente.enviaMensagem(conexao, nomeProcurado)
+  valorProcurado = input(f"Digite o {parametroBusca} do Cliente que deseja procurar: ")
+  print(f'\nProcurando {parametroBusca}: {valorProcurado} ...')
+  cliente.enviaMensagem(conexao, valorProcurado)
   clienteProcurado = cliente.recebeMensagem(conexao)
 
   if (clienteProcurado != []):
-    print( f"\nCliente encontrado! \n > NOME: {clienteProcurado.nome}\n > IP: {clienteProcurado.ip}\n > PORTA: {cliente.porta}\n")
+    print(f"\nCliente encontrado! \n > NOME: {clienteProcurado.nome}\n > IP: {clienteProcurado.ip}\n > PORTA: {cliente.porta}\n")
   else:
-    print("\nCliente com esse nome não encontrado! Tente novamente\n")
+    print(f"\nCliente com esse {parametroBusca} não encontrado! Tente novamente\n")
+
+def buscaClienteServidor(parametroBusca, servidor, socketCliente):
+
+  encontrado = False
+  valorProcurado = servidor.recebeMensagem(socketCliente)
+  print(f"Buscando o cliente com {parametroBusca} igual a {valorProcurado}\n")
+  for cliente in servidor.listaClientes:
+    if (hasattr(cliente, parametroBusca)):
+      if (getattr(cliente, parametroBusca) == valorProcurado):
+        encontrado = True
+        servidor.enviaMensagem(socketCliente, cliente)
+  if(not encontrado):
+    servidor.enviaMensagem(socketCliente, [])
+
+def desligarChamada(cliente, receiverAudio,targetAudio,hostClient, targetClient, conexaoChamada):
+  while input("").upper() != "STOP":
+    print("Chamada em andamento...")
+    continue
+    
+  cliente.ocupado = False
+  receiverAudio.stop_server()
+  targetAudio.stop_stream()
+  hostClient.stop_server()
+  targetClient.stop_stream()
+  conexaoChamada.close()
 
 def menuCliente(conexao, cliente):
 
@@ -73,33 +98,11 @@ def menuCliente(conexao, cliente):
 
   # Buscar pelo nome
   elif (resposta == 2):
-
-    cliente.enviaMensagem(conexao, "buscarNome")
-
-    nomeProcurado = input("Digite o nome do Cliente que deseja procurar: ")
-    print(f'\nProcurando NOME: {nomeProcurado} ...')
-    cliente.enviaMensagem(conexao, nomeProcurado)
-    clienteProcurado = cliente.recebeMensagem(conexao)
-
-    if (clienteProcurado != []):
-      print( f"\nCliente encontrado! \n > NOME: {clienteProcurado.nome}\n > IP: {clienteProcurado.ip}\n > PORTA: {cliente.porta}\n")
-    else:
-      print("\nCliente com esse nome não encontrado! Tente novamente\n")
+    buscaCliente(cliente, conexao, "nome")
 
   # Buscar pelo IP
   elif (resposta == 3):
-    cliente.enviaMensagem(conexao, "buscarIP")
-
-    ipProcurado = input("Digite o ip do Cliente que deseja procurar: ")
-    print(f'\nProcurando IP: {ipProcurado} ...')
-    cliente.enviaMensagem(conexao, ipProcurado)
-    clienteProcurado = cliente.recebeMensagem(conexao)
-    if (clienteProcurado != []):
-      print(
-          f"\nCliente encontrado! \n > NOME: {clienteProcurado.nome}\n > IP: {clienteProcurado.ip}\n > PORTA: {cliente.porta}\n"
-      )
-    else:
-      print("Cliente com esse IP não encontrado! Tente novamente\n")
+    buscaCliente(cliente, conexao, "ip")
 
   # Desligar
   elif (resposta == 4):
@@ -191,22 +194,9 @@ def menuServidor(servidor, socketCliente, cliente):
   if escolhaDoCliente == "listagem":
     servidor.enviaMensagem(socketCliente, servidor.listaClientes)
 
-  elif escolhaDoCliente == "buscarNome":
+  elif escolhaDoCliente == "nome" or escolhaDoCliente == "ip":
 
-    nomeClienteProcurado = servidor.recebeMensagem(socketCliente)
-    print("Buscando o cliente ", nomeClienteProcurado, "\n")
-    for cliente in servidor.listaClientes:
-      if (cliente.nome == nomeClienteProcurado):
-        servidor.enviaMensagem(socketCliente, cliente)
-
-  elif escolhaDoCliente == "buscarIP":
-
-    ipClienteProcurado = servidor.recebeMensagem(socketCliente)
-    print("Buscando o cliente ", ipClienteProcurado, "\n")
-    for cliente in servidor.listaClientes:
-      if (cliente.ip == ipClienteProcurado):
-        servidor.enviaMensagem(socketCliente, cliente)
-    servidor.enviaMensagem(socketCliente, [])
+    buscaClienteServidor(escolhaDoCliente, servidor, socketCliente)
 
   elif escolhaDoCliente == "desligar":
 
@@ -223,17 +213,3 @@ def menuServidor(servidor, socketCliente, cliente):
       print("Erro ao desconectar o cliente")
 
   return True
-
-
-
-def desligarChamada(cliente, receiverAudio,targetAudio,hostClient, targetClient, conexaoChamada):
-  while input("").upper() != "STOP":
-    print("Chamada em andamento...")
-    continue
-    
-  cliente.ocupado = False
-  receiverAudio.stop_server()
-  targetAudio.stop_stream()
-  hostClient.stop_server()
-  targetClient.stop_stream()
-  conexaoChamada.close()

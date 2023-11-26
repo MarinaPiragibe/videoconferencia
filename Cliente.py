@@ -32,7 +32,7 @@ class Cliente:
 
 if __name__ == "__main__":
 
-  HOST = '26.162.121.69'
+  HOST = '26.84.232.20'
   porta = 9300
 
   print(
