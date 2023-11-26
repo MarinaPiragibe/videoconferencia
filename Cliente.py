@@ -8,6 +8,7 @@ import threading
 class Cliente:
 
   def __init__(self, nome, ip, porta):
+    
     self.nome = nome
     self.ip = ip
     self.porta = porta

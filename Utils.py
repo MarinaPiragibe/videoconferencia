@@ -11,9 +11,12 @@ import multiprocessing
 thread_running = True
 def recebeCliente():
   print("\n------------- Login --------------")
-  nome = input('> Informe seu usuário: ')
-  ip = input('> Informe seu IP: ')
-  porta = input('> Informe a porta: ')
+  #input('> Informe seu usuário: ')
+  nome = 'marina'
+  ip = '26.84.232.20'
+  porta = '9800'
+  #input('> Informe seu IP: ')
+  #porta = input('> Informe a porta: ')
   cliente = Cliente(nome, ip, porta)
   return cliente
 
@@ -21,10 +24,12 @@ def recebePortasCliente(cliente, socketClienteChamada):
 
   print("Iniciando a  chamada...\n")
 
-  portaVideo = int(input("> Qual porta deseja usar para receber o video?"))
+  portaVideo = 9810
+  #int(input("> Qual porta deseja usar para receber o video?"))
   cliente.enviaMensagem(socketClienteChamada, portaVideo)
 
-  portaAudio = int(input("> Qual porta deseja usar para receber o audio?"))
+  portaAudio = 9811
+  #int(input("> Qual porta deseja usar para receber o audio?"))
   cliente.enviaMensagem(socketClienteChamada, portaAudio)
 
   return portaAudio, portaVideo
@@ -70,7 +75,7 @@ def desligarChamada(cliente, conexaoChamada):
   cliente.ocupado = False
   cliente.receiverAudio.stop_server()
   cliente.targetAudio.stop_stream()
-  cliente.hostClient.stop_server()
+  # cliente.hostClient.stop_server()
   cliente.targetClient.stop_stream()
   conexaoChamada.close()
 
@@ -113,8 +118,10 @@ def menuCliente(conexao, cliente):
   # Iniciar chamada
   elif (resposta == 5):
 
-    targetIP = input("Digite o IP com quem deseja trocar mensagem ?\n")
-    targetPorta = input("Digite a porta com quem deseja trocar mensagem ?\n")
+    targetIP = "26.162.121.69"
+    #input("Digite o IP com quem deseja trocar mensagem ?\n")
+    targetPorta = 9600
+    #input("Digite a porta com quem deseja trocar mensagem ?\n")
     
     conexaoChamada = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     conexaoChamada.settimeout(None)
@@ -195,9 +202,6 @@ def menuCliente(conexao, cliente):
       while True:
         if(input("Quer sair da chamada?").upper() == "S"):
           cliente.enviaMensagem(socketClienteChamada,"desligar")
-          thread_running = False
-          threadAguardaFinalizarChamada.join()
-          desligarChamada(cliente,socketClienteChamada) 
           break
       
      
@@ -208,11 +212,10 @@ def menuCliente(conexao, cliente):
       cliente.ocupado = False
       conexaoChamada.close()
 
-def fecharChamadaOuvinte(cliente, conexaoChamada):
-  global thread_running
-  if(thread_running ==True):
-    if(cliente.recebeMensagem(conexaoChamada) == "desligar"):
-      desligarChamada(cliente,conexaoChamada)
+def fecharChamadaOuvinte(cliente, conexaoChamada, thread_running):
+  if(cliente.recebeMensagem(conexaoChamada) == "desligar"):
+    cliente.enviaMensagem(conexaoChamada, "desligar")
+    desligarChamada(cliente,conexaoChamada)
 
 def menuServidor(servidor, socketCliente, cliente):
 
