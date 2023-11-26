@@ -12,8 +12,8 @@ import multiprocessing
 def recebeCliente():
   print("\n------------- Login --------------")
   nome = input('> Informe seu usuário: ')
-  ip = '26.84.232.20'
-  porta = '9800'
+  ip = '26.162.121.69'
+  porta = 9600
   #input('> Informe seu IP: ')
   #porta = input('> Informe a porta: ')
   cliente = Cliente(nome, ip, porta)
@@ -68,11 +68,7 @@ def buscaClienteServidor(parametroBusca, servidor, socketCliente):
   if(not encontrado):
     servidor.enviaMensagem(socketCliente, [])
 
-def desligarChamada(cliente, receiverAudio,targetAudio,hostClient, targetClient, conexaoChamada):
-  while input("").upper() != "STOP" or (cliente.recebeMensagem(conexaoChamada) != "desligar"):
-    print("Chamada em andamento...")
-    continue
-  cliente.enviaMensagem(conexaoChamada,"desligar")
+def desligarChamada(cliente, receiverAudio,targetAudio,hostClient, targetClient, conexaoChamada,acabarChamada):
   cliente.ocupado = False
   receiverAudio.stop_server()
   targetAudio.stop_stream()
@@ -187,16 +183,28 @@ def menuCliente(conexao, cliente):
       receiverAudio, targetAudio = AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
 
       thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
-      thread_cronometro.start()
+      #thread_cronometro.start()
       
-            
-      desligarChamada(cliente,receiverAudio,targetAudio,hostClient,targetClient,conexaoChamada) 
-      thread_cronometro.terminate()
+      threadAguardaFinalizarChamada = multiprocessing.Process(target=fecharChamadOuvinte, args=[cliente,socketClienteChamada])
+      threadAguardaFinalizarChamada.start()
+      while True:
+        if( input("Quer sair da chamada?").upper() == "S"):
+          cliente.enviaMensagem(socketClienteChamada,"desligar")
+          threadAguardaFinalizarChamada.terminate()
+          desligarChamada(cliente,receiverAudio,targetAudio,hostClient,targetClient,socketClienteChamada) 
+          break
+      
+     
+      #thread_cronometro.terminate()
       
     if(resposta.upper() == "R"):
       print("Chamada recusada.......\n")
       cliente.ocupado = False
       conexaoChamada.close()
+
+def fecharChamadOuvinte(cliente, conexaoChamada,receiverAudio,targetAudio,hostClient,targetClient):
+  if(cliente.recebeMensagem(conexaoChamada) == "desligar"):
+    desligarChamada(cliente,receiverAudio,targetAudio,hostClient,targetClient,conexaoChamada)
 
 def menuServidor(servidor, socketCliente, cliente):
 
