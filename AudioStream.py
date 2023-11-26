@@ -3,6 +3,7 @@ import threading
 import time
 import socket
 
+
 localIpAddress = socket.gethostbyname(socket.gethostname())
 
 def startAudioStream(cliente, targetClientIP='26.84.232.20', recvPort=7777, targetClientPort=8888): 
@@ -15,9 +16,12 @@ def startAudioStream(cliente, targetClientIP='26.84.232.20', recvPort=7777, targ
     thread_targetClient = threading.Thread(target=targetClient.start_stream)
     thread_targetClient.start()
 
-    cliente.receiverAudio= hostClient
-    cliente.targetAudio = targetClient
+    cliente.hostClientAudio = hostClient
+    cliente.targetClientAudio = targetClient
 
 def closeAudioStream(hostClient, targetClient):
     hostClient.stop_server()
     targetClient.stop_stream()
+
+
+    

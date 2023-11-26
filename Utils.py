@@ -5,6 +5,7 @@ import AudioStream
 import VideoStream
 import threading
 from vidstream import *
+import keyboard
 import Cronometro
 import multiprocessing
 
@@ -72,12 +73,17 @@ def buscaClienteServidor(parametroBusca, servidor, socketCliente):
     servidor.enviaMensagem(socketCliente, [])
 
 def desligarChamada(cliente, conexaoChamada):
+
   cliente.ocupado = False
-  cliente.receiverAudio.stop_server()
-  cliente.targetAudio.stop_stream()
-  # cliente.hostClient.stop_server()
-  cliente.targetClient.stop_stream()
+
+  cliente.hostClientAudio.stop_server()
+  cliente.targetClientAudio.stop_stream()
+
+  cliente.hostClientVideo.stop_server()
+  cliente.targetClientVideo.stop_stream()
+
   conexaoChamada.close()
+  print("Chamada encerrada")
 
 def menuCliente(conexao, cliente):
 
@@ -199,11 +205,15 @@ def menuCliente(conexao, cliente):
       
       threadAguardaFinalizarChamada = threading.Thread(target=fecharChamadaOuvinte, args=[cliente,socketClienteChamada])
       threadAguardaFinalizarChamada.start()
-      while True:
-        if(input("Quer sair da chamada?").upper() == "S"):
-          cliente.enviaMensagem(socketClienteChamada,"desligar")
-          break
       
+      statusChamada = True
+
+      while statusChamada:
+        if keyboard.is_pressed('S'):
+          cliente.enviaMensagem(socketClienteChamada,"desligar")
+          statusChamada = False
+        elif not threadAguardaFinalizarChamada.is_alive():
+          statusChamada = False
      
       #thread_cronometro.terminate()
       
@@ -212,7 +222,7 @@ def menuCliente(conexao, cliente):
       cliente.ocupado = False
       conexaoChamada.close()
 
-def fecharChamadaOuvinte(cliente, conexaoChamada, thread_running):
+def fecharChamadaOuvinte(cliente, conexaoChamada):
   if(cliente.recebeMensagem(conexaoChamada) == "desligar"):
     cliente.enviaMensagem(conexaoChamada, "desligar")
     desligarChamada(cliente,conexaoChamada)

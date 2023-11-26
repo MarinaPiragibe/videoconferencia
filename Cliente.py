@@ -8,16 +8,17 @@ import threading
 class Cliente:
 
   def __init__(self, nome, ip, porta):
-    
+
     self.nome = nome
     self.ip = ip
     self.porta = porta
     self.ativo = False
     self.ocupado = False
-    self.hostClient = any
-    self.targetClient = any
-    self.receiverAudio= any
-    self.targetAudio = any
+
+    self.hostClientVideo = any
+    self.targetClientVideo = any
+    self.hostClientAudio= any
+    self.targetClientAudio = any
 
 
   def recebeMensagem(self, clientSocket):
