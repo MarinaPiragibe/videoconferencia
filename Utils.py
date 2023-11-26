@@ -8,7 +8,7 @@ from vidstream import *
 import Cronometro
 import multiprocessing
 
-
+thread_running = True
 def recebeCliente():
   print("\n------------- Login --------------")
   nome = input('> Informe seu usuário: ')
@@ -194,7 +194,8 @@ def menuCliente(conexao, cliente):
       while True:
         if(input("Quer sair da chamada?").upper() == "S"):
           cliente.enviaMensagem(socketClienteChamada,"desligar")
-          #threadAguardaFinalizarChamada.terminate()
+          thread_running = False
+          threadAguardaFinalizarChamada.join()
           desligarChamada(cliente,socketClienteChamada) 
           break
       
@@ -207,8 +208,10 @@ def menuCliente(conexao, cliente):
       conexaoChamada.close()
 
 def fecharChamadaOuvinte(cliente, conexaoChamada):
-  if(cliente.recebeMensagem(conexaoChamada) == "desligar"):
-    desligarChamada(cliente,conexaoChamada)
+  global thread_running
+  if(thread_running ==True):
+    if(cliente.recebeMensagem(conexaoChamada) == "desligar"):
+      desligarChamada(cliente,conexaoChamada)
 
 def menuServidor(servidor, socketCliente, cliente):
 
