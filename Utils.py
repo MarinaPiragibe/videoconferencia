@@ -85,6 +85,26 @@ def desligarChamada(cliente, conexaoChamada):
   conexaoChamada.close()
   print("Chamada encerrada")
 
+def chamada(cliente, targetIP, portaVideoHost, portaAudioHost, portaVideoTarget, portaAudioTarget, socketClienteChamada):
+  VideoStream.startVideoSteam(cliente,targetIP,portaVideoHost,portaVideoTarget)
+
+  AudioStream.startAudioStream(cliente, targetIP, portaAudioHost, portaAudioTarget)
+
+  #thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
+  #thread_cronometro.start()
+  
+  threadAguardaFinalizarChamada = threading.Thread(target=fecharChamadaOuvinte, args=[cliente,socketClienteChamada])
+  threadAguardaFinalizarChamada.start()
+  
+  statusChamada = True
+
+  while statusChamada:
+    if keyboard.is_pressed('S'):
+      cliente.enviaMensagem(socketClienteChamada,"desligar")
+      statusChamada = False
+    elif not threadAguardaFinalizarChamada.is_alive():
+      statusChamada = False
+
 def menuCliente(conexao, cliente):
 
   print("\n-------------------- Menu --------------------")
@@ -148,22 +168,7 @@ def menuCliente(conexao, cliente):
       
       portaAudioHost, portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
 
-      VideoStream.startVideoSteam(cliente, targetIP ,portaVideoHost,portaVideoTarget)
-
-      AudioStream.startAudioStream(cliente, targetIP, portaAudioHost, portaAudioTarget)
-      
-      #thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
-      #thread_cronometro.start()
-      threadAguardaFinalizarChamada = threading.Thread(target=fecharChamadaOuvinte, args=[cliente,socketClienteChamada])
-      threadAguardaFinalizarChamada.start()
-      while True:
-        if(input("Quer sair da chamada?").upper() == "S"):
-          cliente.enviaMensagem(conexaoChamada,"desligar")
-          thread_running = False
-          threadAguardaFinalizarChamada.join()
-          desligarChamada(cliente,conexaoChamada) 
-          break
-      #thread_cronometro.terminate()
+      chamada(cliente, targetIP, portaVideoHost, portaAudioHost, portaVideoTarget, portaAudioTarget, conexaoChamada)
               
     if(resposta.upper() == "R"):
       print("Chamada Recusada, tente novamente... \n")
@@ -196,24 +201,7 @@ def menuCliente(conexao, cliente):
       portaVideoTarget = cliente.recebeMensagem(socketClienteChamada)
       portaAudioTarget = cliente.recebeMensagem(socketClienteChamada)
 
-      VideoStream.startVideoSteam(cliente,targetIP,portaVideoHost,portaVideoTarget)
-
-      AudioStream.startAudioStream(cliente, targetIP, portaAudioHost, portaAudioTarget)
-
-      #thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
-      #thread_cronometro.start()
-      
-      threadAguardaFinalizarChamada = threading.Thread(target=fecharChamadaOuvinte, args=[cliente,socketClienteChamada])
-      threadAguardaFinalizarChamada.start()
-      
-      statusChamada = True
-
-      while statusChamada:
-        if keyboard.is_pressed('S'):
-          cliente.enviaMensagem(socketClienteChamada,"desligar")
-          statusChamada = False
-        elif not threadAguardaFinalizarChamada.is_alive():
-          statusChamada = False
+      chamada(cliente, targetIP, portaVideoHost, portaAudioHost, portaVideoTarget, portaAudioTarget, socketClienteChamada)
      
       #thread_cronometro.terminate()
       
