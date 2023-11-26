@@ -2,7 +2,7 @@ import time
 from tqdm import tqdm
 
 def cronometro():
-    input("Pressione Enter para iniciar o cronômetro.")
+    #input("Pressione Enter para iniciar o cronômetro.")
     inicio = time.time()
 
     try:
@@ -19,5 +19,5 @@ def cronometro():
     except KeyboardInterrupt:
         print("\nCronômetro interrompido.")
 
-if __name__ == "__main__":
-    cronometro()
+# if __name__ == "__main__":
+#     cronometro()

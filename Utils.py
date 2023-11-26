@@ -3,7 +3,10 @@ import socket
 from Cliente import Cliente
 import AudioStream
 import VideoStream
+import threading
 from vidstream import *
+import Cronometro
+import multiprocessing
 
 
 def recebeCliente():
@@ -66,10 +69,10 @@ def buscaClienteServidor(parametroBusca, servidor, socketCliente):
     servidor.enviaMensagem(socketCliente, [])
 
 def desligarChamada(cliente, receiverAudio,targetAudio,hostClient, targetClient, conexaoChamada):
-  while input("").upper() != "STOP":
+  while input("").upper() != "STOP" or (cliente.recebeMensagem(conexaoChamada) != "desligar"):
     print("Chamada em andamento...")
     continue
-    
+  cliente.enviaMensagem(conexaoChamada,"desligar")
   cliente.ocupado = False
   receiverAudio.stop_server()
   targetAudio.stop_stream()
@@ -142,8 +145,11 @@ def menuCliente(conexao, cliente):
 
       receiverAudio, targetAudio = AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
       
+      thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
+      thread_cronometro.start()
       
       desligarChamada(cliente,receiverAudio,targetAudio,hostClient,targetClient,conexaoChamada)
+      thread_cronometro.close()
               
     if(resposta.upper() == "R"):
       print("Chamada Recusada, tente novamente... \n")
@@ -179,8 +185,13 @@ def menuCliente(conexao, cliente):
       hostClient, targetClient = VideoStream.startVideoSteam(cliente.ip,targetIP,portaVideoHost,portaVideoTarget)
 
       receiverAudio, targetAudio = AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
+
+      thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
+      thread_cronometro.start()
+      
             
       desligarChamada(cliente,receiverAudio,targetAudio,hostClient,targetClient,conexaoChamada) 
+      thread_cronometro.close()
       
     if(resposta.upper() == "R"):
       print("Chamada recusada.......\n")
