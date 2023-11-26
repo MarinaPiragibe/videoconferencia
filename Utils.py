@@ -149,7 +149,7 @@ def menuCliente(conexao, cliente):
       thread_cronometro.start()
       
       desligarChamada(cliente,receiverAudio,targetAudio,hostClient,targetClient,conexaoChamada)
-      thread_cronometro.close()
+      thread_cronometro.terminate()
               
     if(resposta.upper() == "R"):
       print("Chamada Recusada, tente novamente... \n")
@@ -191,7 +191,7 @@ def menuCliente(conexao, cliente):
       
             
       desligarChamada(cliente,receiverAudio,targetAudio,hostClient,targetClient,conexaoChamada) 
-      thread_cronometro.close()
+      thread_cronometro.terminate()
       
     if(resposta.upper() == "R"):
       print("Chamada recusada.......\n")
