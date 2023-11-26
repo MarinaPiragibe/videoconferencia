@@ -1,9 +1,7 @@
 import pickle
 import socket
 from time import sleep
-import Utils
-import threading
-
+from utils import ClienteUtils
 
 class Cliente:
 
@@ -38,13 +36,13 @@ class Cliente:
 
 if __name__ == "__main__":
 
-  HOST = '26.162.121.69'
+  HOST = '26.84.232.20'
   porta = 9300
 
   print(
       "\n\n################ Sistema de Videoconferencia ################\n\n")
   #Cria objeto Cliente com os parametros inseridos
-  cliente = Utils.recebeCliente()
+  cliente = ClienteUtils.recebeCliente()
 
   conexao = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   #conexao.bind((str(cliente.ip), int(cliente.porta)))
@@ -74,5 +72,5 @@ if __name__ == "__main__":
     cliente.ativo = True
 
   while cliente.ativo:
-    Utils.menuCliente(conexao, cliente)
+    ClienteUtils.menuCliente(conexao, cliente)
   conexao.close()

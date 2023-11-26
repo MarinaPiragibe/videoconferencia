@@ -1,7 +1,7 @@
 import socket
 import time
 import pickle
-import Utils
+from utils import ServidorUtils
 import threading
 
 
@@ -36,7 +36,7 @@ class Servidor:
   def registrarNovoCliente(self, socketCliente, cliente):
     conectado = True
     while conectado:
-      conectado = Utils.menuServidor(servidor, socketCliente, cliente)
+      conectado = ServidorUtils.menuServidor(servidor, socketCliente, cliente)
 
     else:
       return conectado
@@ -100,4 +100,4 @@ if __name__ == "__main__":
       print("------------ Finalizando Registro -------------")
       servidor.enviaMensagem(socketCliente, False)
 
-    Utils.imprimeListaClientes(servidor.listaClientes)
+    ServidorUtils.imprimeListaClientes(servidor.listaClientes)

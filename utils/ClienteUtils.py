@@ -1,15 +1,9 @@
+import Cliente
+from stream import Chamada
 from time import sleep
+from utils import Utils
 import socket
-from Cliente import Cliente
-import AudioStream
-import VideoStream
-import threading
-from vidstream import *
-import keyboard
-import Cronometro
-import multiprocessing
 
-thread_running = True
 def recebeCliente():
   print("\n------------- Login --------------")
   #input('> Informe seu usuário: ')
@@ -18,7 +12,7 @@ def recebeCliente():
   porta = '9800'
   #input('> Informe seu IP: ')
   #porta = input('> Informe a porta: ')
-  cliente = Cliente(nome, ip, porta)
+  cliente = Cliente.Cliente(nome, ip, porta)
   return cliente
 
 def recebePortasCliente(cliente, socketClienteChamada):
@@ -35,16 +29,6 @@ def recebePortasCliente(cliente, socketClienteChamada):
 
   return portaAudio, portaVideo
 
-def imprimeListaClientes(listaClientes):
-
-  print("\n--------- Lista de Usuários Cadastrados ---------")
-  for cliente in listaClientes:
-    print("\n")
-    print(f'> NOME: {cliente.nome}')
-    print(f'> IP: {cliente.ip}')
-    print(f'> PORTA: {cliente.porta}')
-    print("---------------")
-
 def buscaCliente(cliente, conexao, parametroBusca):
 
   cliente.enviaMensagem(conexao, parametroBusca)
@@ -58,52 +42,6 @@ def buscaCliente(cliente, conexao, parametroBusca):
     print(f"\nCliente encontrado! \n > NOME: {clienteProcurado.nome}\n > IP: {clienteProcurado.ip}\n > PORTA: {cliente.porta}\n")
   else:
     print(f"\nCliente com esse {parametroBusca} não encontrado! Tente novamente\n")
-
-def buscaClienteServidor(parametroBusca, servidor, socketCliente):
-
-  encontrado = False
-  valorProcurado = servidor.recebeMensagem(socketCliente)
-  print(f"Buscando o cliente com {parametroBusca} igual a {valorProcurado}\n")
-  for cliente in servidor.listaClientes:
-    if (hasattr(cliente, parametroBusca)):
-      if (getattr(cliente, parametroBusca) == valorProcurado):
-        encontrado = True
-        servidor.enviaMensagem(socketCliente, cliente)
-  if(not encontrado):
-    servidor.enviaMensagem(socketCliente, [])
-
-def desligarChamada(cliente, conexaoChamada):
-
-  cliente.ocupado = False
-
-  cliente.hostClientAudio.stop_server()
-  cliente.targetClientAudio.stop_stream()
-
-  cliente.hostClientVideo.stop_server()
-  cliente.targetClientVideo.stop_stream()
-
-  conexaoChamada.close()
-  print("Chamada encerrada")
-
-def chamada(cliente, targetIP, portaVideoHost, portaAudioHost, portaVideoTarget, portaAudioTarget, socketClienteChamada):
-  VideoStream.startVideoSteam(cliente,targetIP,portaVideoHost,portaVideoTarget)
-
-  AudioStream.startAudioStream(cliente, targetIP, portaAudioHost, portaAudioTarget)
-
-  #thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
-  #thread_cronometro.start()
-  
-  threadAguardaFinalizarChamada = threading.Thread(target=fecharChamadaOuvinte, args=[cliente,socketClienteChamada])
-  threadAguardaFinalizarChamada.start()
-  
-  statusChamada = True
-
-  while statusChamada:
-    if keyboard.is_pressed('S'):
-      cliente.enviaMensagem(socketClienteChamada,"desligar")
-      statusChamada = False
-    elif not threadAguardaFinalizarChamada.is_alive():
-      statusChamada = False
 
 def menuCliente(conexao, cliente):
 
@@ -122,7 +60,7 @@ def menuCliente(conexao, cliente):
 
     cliente.enviaMensagem(conexao, "listagem")
     listaClientes = cliente.recebeMensagem(conexao)
-    imprimeListaClientes(listaClientes)
+    Utils.imprimeListaClientes(listaClientes)
 
   # Buscar pelo nome
   elif (resposta == 2):
@@ -168,7 +106,7 @@ def menuCliente(conexao, cliente):
       
       portaAudioHost, portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
 
-      chamada(cliente, targetIP, portaVideoHost, portaAudioHost, portaVideoTarget, portaAudioTarget, conexaoChamada)
+      Chamada.chamada(cliente, targetIP, portaVideoHost, portaAudioHost, portaVideoTarget, portaAudioTarget, conexaoChamada)
               
     if(resposta.upper() == "R"):
       print("Chamada Recusada, tente novamente... \n")
@@ -201,7 +139,7 @@ def menuCliente(conexao, cliente):
       portaVideoTarget = cliente.recebeMensagem(socketClienteChamada)
       portaAudioTarget = cliente.recebeMensagem(socketClienteChamada)
 
-      chamada(cliente, targetIP, portaVideoHost, portaAudioHost, portaVideoTarget, portaAudioTarget, socketClienteChamada)
+      Chamada.chamada(cliente, targetIP, portaVideoHost, portaAudioHost, portaVideoTarget, portaAudioTarget, socketClienteChamada)
      
       #thread_cronometro.terminate()
       
@@ -210,34 +148,3 @@ def menuCliente(conexao, cliente):
       cliente.ocupado = False
       conexaoChamada.close()
 
-def fecharChamadaOuvinte(cliente, conexaoChamada):
-  if(cliente.recebeMensagem(conexaoChamada) == "desligar"):
-    cliente.enviaMensagem(conexaoChamada, "desligar")
-    desligarChamada(cliente,conexaoChamada)
-
-def menuServidor(servidor, socketCliente, cliente):
-
-  escolhaDoCliente = servidor.recebeMensagem(socketCliente)
-
-  if escolhaDoCliente == "listagem":
-    servidor.enviaMensagem(socketCliente, servidor.listaClientes)
-
-  elif escolhaDoCliente == "nome" or escolhaDoCliente == "ip":
-
-    buscaClienteServidor(escolhaDoCliente, servidor, socketCliente)
-
-  elif escolhaDoCliente == "desligar":
-
-    try:
-      servidor.enviaMensagem(socketCliente, "Sua conexão foi encerrada com sucesso. Adeus!")
-      print("Desconectando o cliente ", cliente.nome, "\n")
-      socketCliente.close()
-      servidor.listaSockets.remove(socketCliente)
-      servidor.listaClientes.remove(cliente)
-      return False
-    
-    except:
-      servidor.enviaMensagem(socketCliente,"Erro ao encerrar a conexão. Tente novamente")
-      print("Erro ao desconectar o cliente")
-
-  return True
