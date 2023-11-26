@@ -146,7 +146,8 @@ def menuCliente(conexao, cliente):
       while True:
         if(input("Quer sair da chamada?").upper() == "S"):
           cliente.enviaMensagem(conexaoChamada,"desligar")
-          #threadAguardaFinalizarChamada.terminate()
+          thread_running = False
+          threadAguardaFinalizarChamada.join()
           desligarChamada(cliente,conexaoChamada) 
           break
       #thread_cronometro.terminate()
