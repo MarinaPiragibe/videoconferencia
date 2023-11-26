@@ -6,9 +6,9 @@ import time
 
 localIpAddress = socket.gethostbyname(socket.gethostname())
 
-def startVideoSteam(hostIP=localIpAddress, targetIP='26.162.121.69', hostPort=8888, targetPort=7777):
+def startVideoSteam(cliente, targetIP='26.162.121.69', hostPort=8888, targetPort=7777):
     
-    hostClient = StreamingServer(str(hostIP), int(hostPort))
+    hostClient = StreamingServer(str(cliente.ip), int(hostPort))
     thread_hostClient = threading.Thread(target=hostClient.start_server)
     thread_hostClient.start()
 
@@ -16,7 +16,8 @@ def startVideoSteam(hostIP=localIpAddress, targetIP='26.162.121.69', hostPort=88
     thread_targetClient = threading.Thread(target=targetClient.start_stream)
     thread_targetClient.start()
 
-    return hostClient, targetClient
+    cliente.targetClient = targetClient
+    cliente.hostCliente = hostClient
     
 
 

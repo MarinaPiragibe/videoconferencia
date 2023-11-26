@@ -13,6 +13,10 @@ class Cliente:
     self.porta = porta
     self.ativo = False
     self.ocupado = False
+    self.hostClient = any
+    self.targetClient = any
+    self.receiverAudio= any
+    self.targetAudio = any
 
 
   def recebeMensagem(self, clientSocket):

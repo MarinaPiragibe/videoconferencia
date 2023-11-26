@@ -12,10 +12,8 @@ import multiprocessing
 def recebeCliente():
   print("\n------------- Login --------------")
   nome = input('> Informe seu usuário: ')
-  ip = '26.162.121.69'
-  porta = 9600
-  #input('> Informe seu IP: ')
-  #porta = input('> Informe a porta: ')
+  ip = input('> Informe seu IP: ')
+  porta = input('> Informe a porta: ')
   cliente = Cliente(nome, ip, porta)
   return cliente
 
@@ -68,12 +66,12 @@ def buscaClienteServidor(parametroBusca, servidor, socketCliente):
   if(not encontrado):
     servidor.enviaMensagem(socketCliente, [])
 
-def desligarChamada(cliente, receiverAudio,targetAudio,hostClient, targetClient, conexaoChamada,acabarChamada):
+def desligarChamada(cliente, conexaoChamada):
   cliente.ocupado = False
-  receiverAudio.stop_server()
-  targetAudio.stop_stream()
-  hostClient.stop_server()
-  targetClient.stop_stream()
+  cliente.receiverAudio.stop_server()
+  cliente.targetAudio.stop_stream()
+  cliente.hostClient.stop_server()
+  cliente.targetClient.stop_stream()
   conexaoChamada.close()
 
 def menuCliente(conexao, cliente):
@@ -137,15 +135,21 @@ def menuCliente(conexao, cliente):
       
       portaAudioHost, portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
 
-      hostClient, targetClient = VideoStream.startVideoSteam(cliente.ip, targetIP ,portaVideoHost,portaVideoTarget)
+      VideoStream.startVideoSteam(cliente, targetIP ,portaVideoHost,portaVideoTarget)
 
-      receiverAudio, targetAudio = AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
+      AudioStream.startAudioStream(cliente, targetIP, portaAudioHost, portaAudioTarget)
       
-      thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
-      thread_cronometro.start()
-      
-      desligarChamada(cliente,receiverAudio,targetAudio,hostClient,targetClient,conexaoChamada)
-      thread_cronometro.terminate()
+      #thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
+      #thread_cronometro.start()
+      threadAguardaFinalizarChamada = threading.Thread(target=fecharChamadaOuvinte, args=[cliente,socketClienteChamada])
+      threadAguardaFinalizarChamada.start()
+      while True:
+        if(input("Quer sair da chamada?").upper() == "S"):
+          cliente.enviaMensagem(conexaoChamada,"desligar")
+          #threadAguardaFinalizarChamada.terminate()
+          desligarChamada(cliente,conexaoChamada) 
+          break
+      #thread_cronometro.terminate()
               
     if(resposta.upper() == "R"):
       print("Chamada Recusada, tente novamente... \n")
@@ -178,20 +182,20 @@ def menuCliente(conexao, cliente):
       portaVideoTarget = cliente.recebeMensagem(socketClienteChamada)
       portaAudioTarget = cliente.recebeMensagem(socketClienteChamada)
 
-      hostClient, targetClient = VideoStream.startVideoSteam(cliente.ip,targetIP,portaVideoHost,portaVideoTarget)
+      VideoStream.startVideoSteam(cliente,targetIP,portaVideoHost,portaVideoTarget)
 
-      receiverAudio, targetAudio = AudioStream.startAudioStream(cliente.ip, targetIP, portaAudioHost, portaAudioTarget)
+      AudioStream.startAudioStream(cliente, targetIP, portaAudioHost, portaAudioTarget)
 
-      thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
+      #thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
       #thread_cronometro.start()
       
-      threadAguardaFinalizarChamada = multiprocessing.Process(target=fecharChamadOuvinte, args=[cliente,socketClienteChamada])
+      threadAguardaFinalizarChamada = threading.Thread(target=fecharChamadaOuvinte, args=[cliente,socketClienteChamada])
       threadAguardaFinalizarChamada.start()
       while True:
-        if( input("Quer sair da chamada?").upper() == "S"):
+        if(input("Quer sair da chamada?").upper() == "S"):
           cliente.enviaMensagem(socketClienteChamada,"desligar")
-          threadAguardaFinalizarChamada.terminate()
-          desligarChamada(cliente,receiverAudio,targetAudio,hostClient,targetClient,socketClienteChamada) 
+          #threadAguardaFinalizarChamada.terminate()
+          desligarChamada(cliente,socketClienteChamada) 
           break
       
      
@@ -202,9 +206,9 @@ def menuCliente(conexao, cliente):
       cliente.ocupado = False
       conexaoChamada.close()
 
-def fecharChamadOuvinte(cliente, conexaoChamada,receiverAudio,targetAudio,hostClient,targetClient):
+def fecharChamadaOuvinte(cliente, conexaoChamada):
   if(cliente.recebeMensagem(conexaoChamada) == "desligar"):
-    desligarChamada(cliente,receiverAudio,targetAudio,hostClient,targetClient,conexaoChamada)
+    desligarChamada(cliente,conexaoChamada)
 
 def menuServidor(servidor, socketCliente, cliente):
 
