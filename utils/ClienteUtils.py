@@ -132,18 +132,19 @@ def menuCliente(conexao, cliente):
     cliente.enviaMensagem(conexaoChamada, resposta)
 
     if (resposta.upper() == "A"):
-        chamada = Chamada.Chamada(conexaoChamada)
+        
         videoStream = VideoStream.VideoStream()
         audioStream = AudioStream.AudioStream()
-
-        chamada.targetIP = cliente.recebeMensagem(conexaoChamada)
         
         audioStream.portaAudioHost, videoStream.portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
 
         videoStream.portaVideoTarget = cliente.recebeMensagem(conexaoChamada)
         audioStream.portaAudioTarget = cliente.recebeMensagem(conexaoChamada)
 
-        Chamada.chamada(cliente, videoStream, audioStream)
+        chamada = Chamada.Chamada(conexaoChamada, videoStream, audioStream)
+        chamada.targetIP = cliente.recebeMensagem(conexaoChamada)
+
+        chamada.iniciarChamada(cliente, videoStream, audioStream)
         
         #thread_cronometro.terminate()
       
