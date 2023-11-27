@@ -4,20 +4,23 @@ import socket
 import threading
 import time
 
-localIpAddress = socket.gethostbyname(socket.gethostname())
+class VideoStream:
+    def __init__(self):
+        self.portaVideoHost = None
+        self.portaVideoTarget = None
 
-def startVideoSteam(cliente, targetIP='26.162.121.69', hostPort=8888, targetPort=7777):
-    
-    hostClient = StreamingServer(str(cliente.ip), int(hostPort))
-    thread_hostClient = threading.Thread(target=hostClient.start_server)
-    thread_hostClient.start()
+    localIpAddress = socket.gethostbyname(socket.gethostname())
 
-    targetClient = CameraClient(str(targetIP), int(targetPort))
-    thread_targetClient = threading.Thread(target=targetClient.start_stream)
-    thread_targetClient.start()
+    def startVideoSteam(self, cliente, targetIP='26.162.121.69'):
+        
+        hostClient = StreamingServer(str(cliente.ip), int(self.portaVideoHost))
+        thread_hostClient = threading.Thread(target=hostClient.start_server)
+        thread_hostClient.start()
 
-    cliente.hostClientVideo = hostClient
-    cliente.targetClientVideo = targetClient
+        targetClient = CameraClient(str(targetIP), int(self.portaVideoTarget))
+        thread_targetClient = threading.Thread(target=targetClient.start_stream)
+        thread_targetClient.start()
+
     
     
 

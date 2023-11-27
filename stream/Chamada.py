@@ -3,41 +3,47 @@ import threading
 import socket
 import keyboard
 
-def chamada(cliente, targetIP, portaVideoHost, portaAudioHost, portaVideoTarget, portaAudioTarget, socketClienteChamada):
-  VideoStream.startVideoSteam(cliente,targetIP,portaVideoHost,portaVideoTarget)
+class Chamada:
+    def __init__(self, conexao):
+        self.cliente = None
+        self.targetIP = None
+        self.conexao = conexao
 
-  AudioStream.startAudioStream(cliente, targetIP, portaAudioHost, portaAudioTarget)
+    def iniciarChamada(self, cliente, videoStream, audioStream):
+        videoStream.startVideoSteam(cliente, self.targetIP)
 
-  #thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
-  #thread_cronometro.start()
-  
-  threadAguardaFinalizarChamada = threading.Thread(target=fecharChamadaOuvinte, args=[cliente,socketClienteChamada])
-  threadAguardaFinalizarChamada.start()
-  
-  statusChamada = True
+        audioStream.startAudioStream(cliente, self.targetIP)
 
-  while statusChamada:
-    if keyboard.is_pressed('S'):
-      cliente.enviaMensagem(socketClienteChamada,"desligar")
-      statusChamada = False
-    elif not threadAguardaFinalizarChamada.is_alive():
-      statusChamada = False
+        #thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
+        #thread_cronometro.start()
+        
+        threadAguardaFinalizarChamada = threading.Thread(target=self.desligarChamada, args=[cliente,self.conexao])
+        threadAguardaFinalizarChamada.start()
+        
+        statusChamada = True
 
-def fecharChamadaOuvinte(cliente, conexaoChamada):
-  if(cliente.recebeMensagem(conexaoChamada) == "desligar"):
-    cliente.enviaMensagem(conexaoChamada, "desligar")
-    desligarChamada(cliente,conexaoChamada)
+        while statusChamada:
+            if keyboard.is_pressed('S'):
+                cliente.enviaMensagem(self.conexao,"desligar")
+                statusChamada = False
+            elif not threadAguardaFinalizarChamada.is_alive():
+                statusChamada = False
 
-def desligarChamada(cliente, conexaoChamada):
+    def desligarChamada(self, cliente, conexaoChamada):
+        if(cliente.recebeMensagem(conexaoChamada) == "desligar"):
+            cliente.enviaMensagem(conexaoChamada, "desligar")
+            self.desligarConexoes(cliente,conexaoChamada)
 
-  cliente.ocupado = False
+    def desligarConexoes(self,cliente, conexaoChamada):
 
-  cliente.hostClientAudio.stop_server()
-  cliente.targetClientAudio.stop_stream()
+        cliente.ocupado = False
 
-  cliente.hostClientVideo.stop_server()
-  cliente.targetClientVideo.stop_stream()
+        cliente.hostClientAudio.stop_server()
+        cliente.targetClientAudio.stop_stream()
 
-  conexaoChamada.close()
-  print("Chamada encerrada")
+        cliente.hostClientVideo.stop_server()
+        cliente.targetClientVideo.stop_stream()
+
+        conexaoChamada.close()
+        print("Chamada encerrada")
 

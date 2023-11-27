@@ -3,6 +3,7 @@ from stream import Chamada
 from time import sleep
 from utils import Utils
 import socket
+from stream import AudioStream, VideoStream
 
 def recebeCliente():
   print("\n------------- Login --------------")
@@ -98,53 +99,56 @@ def menuCliente(conexao, cliente):
     
     if (resposta.upper() == "A"):
       
-      print("Iniciando a  chamada.......\n")
-      cliente.enviaMensagem(conexaoChamada, cliente.ip)
-      
-      portaVideoTarget = cliente.recebeMensagem(conexaoChamada)
-      portaAudioTarget = cliente.recebeMensagem(conexaoChamada)
-      
-      portaAudioHost, portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
+        print("Iniciando a  chamada.......\n")
+        cliente.enviaMensagem(conexaoChamada, cliente.ip)
+        
+        portaVideoTarget = cliente.recebeMensagem(conexaoChamada)
+        portaAudioTarget = cliente.recebeMensagem(conexaoChamada)
+        
+        portaAudioHost, portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
 
-      Chamada.chamada(cliente, targetIP, portaVideoHost, portaAudioHost, portaVideoTarget, portaAudioTarget, conexaoChamada)
-              
+        Chamada.chamada(cliente, targetIP, portaVideoHost, portaAudioHost, portaVideoTarget, portaAudioTarget, conexaoChamada)
+                
     if(resposta.upper() == "R"):
-      print("Chamada Recusada, tente novamente... \n")
-      cliente.ocupado = False
-      conexaoChamada.close()
+        print("Chamada Recusada, tente novamente... \n")
+        cliente.ocupado = False
+        conexaoChamada.close()
 
   # Aceitar chamada
   elif (resposta == 6):
 
-    conexaoChamada = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    conexaoChamada.bind((str(cliente.ip), int(cliente.porta)))
-    conexaoChamada.listen()
-    socketClienteChamada, endereco = conexaoChamada.accept()
+    conexao = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    conexao.bind((str(cliente.ip), int(cliente.porta)))
+    conexao.listen()
+    conexaoChamada, endereco = conexao.accept()
 
-    print(socketClienteChamada)
+    print(conexaoChamada)
 
-    solicitacaoChamada = cliente.recebeMensagem(socketClienteChamada)
+    solicitacaoChamada = cliente.recebeMensagem(conexaoChamada)
     print(solicitacaoChamada)
 
     cliente.ocupado = True
     resposta = str(input("Deseja aceitar (A) ou recusar (R) a chamada ??\n"))
-    cliente.enviaMensagem(socketClienteChamada, resposta)
+    cliente.enviaMensagem(conexaoChamada, resposta)
 
     if (resposta.upper() == "A"):
-      
-      targetIP = cliente.recebeMensagem(socketClienteChamada)
-      
-      portaAudioHost, portaVideoHost = recebePortasCliente(cliente, socketClienteChamada)
+        chamada = Chamada.Chamada(conexaoChamada)
+        videoStream = VideoStream.VideoStream()
+        audioStream = AudioStream.AudioStream()
 
-      portaVideoTarget = cliente.recebeMensagem(socketClienteChamada)
-      portaAudioTarget = cliente.recebeMensagem(socketClienteChamada)
+        chamada.targetIP = cliente.recebeMensagem(conexaoChamada)
+        
+        audioStream.portaAudioHost, videoStream.portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
 
-      Chamada.chamada(cliente, targetIP, portaVideoHost, portaAudioHost, portaVideoTarget, portaAudioTarget, socketClienteChamada)
-     
-      #thread_cronometro.terminate()
+        videoStream.portaVideoTarget = cliente.recebeMensagem(conexaoChamada)
+        audioStream.portaAudioTarget = cliente.recebeMensagem(conexaoChamada)
+
+        Chamada.chamada(cliente, videoStream, audioStream)
+        
+        #thread_cronometro.terminate()
       
     if(resposta.upper() == "R"):
-      print("Chamada recusada.......\n")
-      cliente.ocupado = False
-      conexaoChamada.close()
+        print("Chamada recusada.......\n")
+        cliente.ocupado = False
+        conexaoChamada.close()
 
