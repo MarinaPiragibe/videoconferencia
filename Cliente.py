@@ -13,12 +13,6 @@ class Cliente:
     self.ativo = False
     self.ocupado = False
 
-    self.hostClientVideo = any
-    self.targetClientVideo = any
-    self.hostClientAudio= any
-    self.targetClientAudio = any
-
-
   def recebeMensagem(self, clientSocket):
     while True:
       msg = pickle.loads(clientSocket.recv(1024))
