@@ -11,10 +11,10 @@ class Chamada:
         self.audioStream = audioStream
         self.conexao = conexao
 
-    def iniciarChamada(self, cliente, videoStream, audioStream):
-        videoStream.startVideoSteam(cliente, self.targetIP)
+    def iniciarChamada(self, cliente):
+        self.videoStream.startVideoSteam(cliente, self.targetIP)
 
-        audioStream.startAudioStream(cliente, self.targetIP)
+        self.audioStream.startAudioStream(cliente, self.targetIP)
 
         #thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
         #thread_cronometro.start()

@@ -98,16 +98,22 @@ def menuCliente(conexao, cliente):
     resposta = cliente.recebeMensagem(conexaoChamada)
     
     if (resposta.upper() == "A"):
-      
+        
         print("Iniciando a  chamada.......\n")
+
+        videoStream = VideoStream.VideoStream()
+        audioStream = AudioStream.AudioStream()
+
+        videoStream.portaVideoTarget = cliente.recebeMensagem(conexaoChamada)
+        audioStream.portaAudioTarget = cliente.recebeMensagem(conexaoChamada)
+
+        audioStream.portaAudioHost, videoStream.portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
+
+        chamada = Chamada.Chamada(conexaoChamada, videoStream, audioStream)
+
         cliente.enviaMensagem(conexaoChamada, cliente.ip)
         
-        portaVideoTarget = cliente.recebeMensagem(conexaoChamada)
-        portaAudioTarget = cliente.recebeMensagem(conexaoChamada)
-        
-        portaAudioHost, portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
-
-        Chamada.chamada(cliente, targetIP, portaVideoHost, portaAudioHost, portaVideoTarget, portaAudioTarget, conexaoChamada)
+        chamada.iniciarChamada(cliente)
                 
     if(resposta.upper() == "R"):
         print("Chamada Recusada, tente novamente... \n")
@@ -132,7 +138,9 @@ def menuCliente(conexao, cliente):
     cliente.enviaMensagem(conexaoChamada, resposta)
 
     if (resposta.upper() == "A"):
-        
+      
+        print("Iniciando a  chamada.......\n")
+
         videoStream = VideoStream.VideoStream()
         audioStream = AudioStream.AudioStream()
         
@@ -144,7 +152,7 @@ def menuCliente(conexao, cliente):
         chamada = Chamada.Chamada(conexaoChamada, videoStream, audioStream)
         chamada.targetIP = cliente.recebeMensagem(conexaoChamada)
 
-        chamada.iniciarChamada(cliente, videoStream, audioStream)
+        chamada.iniciarChamada(cliente)
         
         #thread_cronometro.terminate()
       
