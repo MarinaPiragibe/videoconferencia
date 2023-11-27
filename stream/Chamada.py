@@ -40,11 +40,11 @@ class Chamada:
 
         cliente.ocupado = False
 
-        self.audioStream.hostClientAudio.stop_server()
-        self.audioStream.targetClientAudio.stop_stream()
+        self.audioStream.hostClient.stop_server()
+        self.audioStream.targetClient.stop_stream()
 
-        self.videoStream.hostClientVideo.stop_server()
-        self.videoStream.targetClientVideo.stop_stream()
+        self.videoStream.hostClient.stop_server()
+        self.videoStream.targetClient.stop_stream()
 
         conexaoChamada.close()
         print("Chamada encerrada")

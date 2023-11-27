@@ -1,7 +1,7 @@
 import socket
 import time
 import pickle
-from utils import ServidorUtils
+from utils import ServidorUtils, Utils
 import threading
 
 
@@ -100,4 +100,4 @@ if __name__ == "__main__":
       print("------------ Finalizando Registro -------------")
       servidor.enviaMensagem(socketCliente, False)
 
-    ServidorUtils.imprimeListaClientes(servidor.listaClientes)
+    Utils.imprimeListaClientes(servidor.listaClientes)
