@@ -19,6 +19,7 @@ class AudioStream:
         self.hostClient = AudioReceiver(str(cliente.ip), int(self.portaAudioHost))# Ip da sua máquina e porta receptora
         self.hostClient.start_server()
 
+
         self.targetClient = AudioSender(str(targetClientIP), int(self.portaAudioTarget)) # Ip da targetClient e porta receptora da targetClient
         self.targetClient.start_stream()
 

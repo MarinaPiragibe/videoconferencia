@@ -17,6 +17,7 @@ class VideoStream:
         self.hostClient = StreamingServer(str(cliente.ip), int(self.portaVideoHost))
         self.hostClient.start_server()
 
+
         self.targetClient = CameraClient(str(targetIP), int(self.portaVideoTarget))
         self.targetClient.start_stream()
 

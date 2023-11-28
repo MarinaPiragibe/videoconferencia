@@ -79,6 +79,8 @@ def menuCliente(conexao, cliente):
   elif (resposta == 5):
 
     targetIP = input("Digite o IP com quem deseja trocar mensagem ?\n")
+
+    #input("Digite o IP com quem deseja trocar mensagem ?\n")
     targetPorta = input("Digite a porta com quem deseja trocar mensagem ?\n")
     
     conexaoChamada = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -103,9 +105,7 @@ def menuCliente(conexao, cliente):
         audioStream.portaAudioHost, videoStream.portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
 
         chamada = Chamada.Chamada(conexaoChamada, videoStream, audioStream)
-
         chamada.targetIP = targetIP
-
         cliente.enviaMensagem(conexaoChamada, cliente.ip)
         
         chamada.iniciarChamada(cliente)
