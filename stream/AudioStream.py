@@ -17,16 +17,11 @@ class AudioStream:
     def startAudioStream(self, cliente, targetClientIP): 
 
         self.hostClient = AudioReceiver(str(cliente.ip), int(self.portaAudioHost))# Ip da sua máquina e porta receptora
-        thread_hostClient = threading.Thread(target=self.hostClient.start_server)
-        thread_hostClient.start()
+        self.hostClient.start_server()
 
         self.targetClient = AudioSender(str(targetClientIP), int(self.portaAudioTarget)) # Ip da targetClient e porta receptora da targetClient
-        thread_targetClient = threading.Thread(target=self.targetClient.start_stream)
-        thread_targetClient.start()
+        self.targetClient.start_stream()
 
-    # def closeAudioStream(hostClient, targetClient):
-    #     hostClient.stop_server()
-    #     targetClient.stop_stream()
 
 
     

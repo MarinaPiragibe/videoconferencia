@@ -11,17 +11,14 @@ class VideoStream:
         self.hostClient = None
         self.targetClient = None
 
-    localIpAddress = socket.gethostbyname(socket.gethostname())
 
     def startVideoSteam(self, cliente, targetIP):
         
         self.hostClient = StreamingServer(str(cliente.ip), int(self.portaVideoHost))
-        thread_hostClient = threading.Thread(target=self.hostClient.start_server)
-        thread_hostClient.start()
+        self.hostClient.start_server()
 
         self.targetClient = CameraClient(str(targetIP), int(self.portaVideoTarget))
-        thread_targetClient = threading.Thread(target=self.targetClient.start_stream)
-        thread_targetClient.start()
+        self.targetClient.start_stream()
 
     
     

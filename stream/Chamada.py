@@ -2,6 +2,8 @@ from stream import VideoStream, AudioStream
 import threading
 import socket
 import keyboard
+import multiprocessing
+from utils import Cronometro
 
 class Chamada:
     def __init__(self, conexao, videoStream, audioStream):
@@ -12,12 +14,15 @@ class Chamada:
         self.conexao = conexao
 
     def iniciarChamada(self, cliente):
+
+        print("Iniciando a chamada...")
+
         self.videoStream.startVideoSteam(cliente, self.targetIP)
 
         self.audioStream.startAudioStream(cliente, self.targetIP)
 
-        #thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
-        #thread_cronometro.start()
+        thread_cronometro = multiprocessing.Process(target=Cronometro.cronometro, args=())
+        thread_cronometro.start()
         
         threadAguardaFinalizarChamada = threading.Thread(target=self.desligarChamada, args=[cliente, self.conexao])
         threadAguardaFinalizarChamada.start()
@@ -28,8 +33,10 @@ class Chamada:
             if keyboard.is_pressed('S'):
                 cliente.enviaMensagem(self.conexao,"desligar")
                 statusChamada = False
+                thread_cronometro.terminate()
             elif not threadAguardaFinalizarChamada.is_alive():
                 statusChamada = False
+                thread_cronometro.terminate()
 
     def desligarChamada(self, cliente, conexaoChamada):
         if(cliente.recebeMensagem(conexaoChamada) == "desligar"):

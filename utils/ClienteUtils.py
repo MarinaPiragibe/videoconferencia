@@ -7,25 +7,20 @@ from stream import AudioStream, VideoStream
 
 def recebeCliente():
   print("\n------------- Login --------------")
-  #input('> Informe seu usuário: ')
-  nome = 'marina'
-  ip = '26.84.232.20'
-  porta = '9800'
-  #input('> Informe seu IP: ')
-  #porta = input('> Informe a porta: ')
+  nome = input('> Informe seu usuário: ')
+  ip = input('> Informe seu IP: ')
+  porta = input('> Informe a porta: ')
   cliente = Cliente.Cliente(nome, ip, porta)
   return cliente
 
 def recebePortasCliente(cliente, socketClienteChamada):
 
-  print("Iniciando a  chamada...\n")
+  print("Configurando a  chamada...")
 
-  portaVideo = 9810
-  #int(input("> Qual porta deseja usar para receber o video?"))
+  portaVideo = int(input("> Qual porta deseja usar para receber o video?"))
   cliente.enviaMensagem(socketClienteChamada, portaVideo)
 
-  portaAudio = 9811
-  #int(input("> Qual porta deseja usar para receber o audio?"))
+  portaAudio = int(input("> Qual porta deseja usar para receber o audio?"))
   cliente.enviaMensagem(socketClienteChamada, portaAudio)
 
   return portaAudio, portaVideo
@@ -83,10 +78,8 @@ def menuCliente(conexao, cliente):
   # Iniciar chamada
   elif (resposta == 5):
 
-    targetIP = "26.162.121.69"
-    #input("Digite o IP com quem deseja trocar mensagem ?\n")
-    targetPorta = 9600
-    #input("Digite a porta com quem deseja trocar mensagem ?\n")
+    targetIP = input("Digite o IP com quem deseja trocar mensagem ?\n")
+    targetPorta = input("Digite a porta com quem deseja trocar mensagem ?\n")
     
     conexaoChamada = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     conexaoChamada.settimeout(None)
@@ -99,7 +92,7 @@ def menuCliente(conexao, cliente):
     
     if (resposta.upper() == "A"):
         
-        print("Iniciando a  chamada.......\n")
+        print("Fazendo a  conexão......")
 
         videoStream = VideoStream.VideoStream()
         audioStream = AudioStream.AudioStream()
@@ -110,6 +103,8 @@ def menuCliente(conexao, cliente):
         audioStream.portaAudioHost, videoStream.portaVideoHost = recebePortasCliente(cliente, conexaoChamada)
 
         chamada = Chamada.Chamada(conexaoChamada, videoStream, audioStream)
+
+        chamada.targetIP = targetIP
 
         cliente.enviaMensagem(conexaoChamada, cliente.ip)
         
@@ -139,7 +134,7 @@ def menuCliente(conexao, cliente):
 
     if (resposta.upper() == "A"):
       
-        print("Iniciando a  chamada.......\n")
+        print("Fazendo a  conexão......")
 
         videoStream = VideoStream.VideoStream()
         audioStream = AudioStream.AudioStream()
@@ -154,7 +149,6 @@ def menuCliente(conexao, cliente):
 
         chamada.iniciarChamada(cliente)
         
-        #thread_cronometro.terminate()
       
     if(resposta.upper() == "R"):
         print("Chamada recusada.......\n")
